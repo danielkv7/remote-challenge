@@ -5,7 +5,9 @@ defmodule RemoteChallengeWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/api", RemoteChallengeWeb do
+  scope "/", RemoteChallengeWeb do
     pipe_through :api
+
+    get "/", UserController, :index
   end
 end

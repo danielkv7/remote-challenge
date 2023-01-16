@@ -34,4 +34,22 @@ defmodule RemoteChallenge.Users.Services.User do
 
     :ok
   end
+
+  @doc """
+  Returns list of users (min 0 and max of 2 users) with points higher then user worker min_number.
+
+  ## Examples
+
+      iex> list_users_with_points_higher_than_number()
+      [%User{}...]
+
+  """
+  @spec list_users_with_points_higher_than_number(number :: integer) :: [User.t()]
+  def list_users_with_points_higher_than_number(number) do
+    User
+    |> where([u], u.points > ^number)
+    |> select([u], %{id: u.id, points: u.points})
+    |> limit(2)
+    |> Repo.all()
+  end
 end

@@ -9,6 +9,9 @@ defmodule RemoteChallenge.Users.Processes.UserWorker do
   def start_link(args, opts \\ []),
     do: GenServer.start_link(__MODULE__, args, [name: __MODULE__] ++ opts)
 
+  def list_users_with_points_higher_than_min_number(),
+    do: GenServer.call(__MODULE__, :list_users_with_points_higher_than_min_number)
+
   ######################
   # Server (callbacks) #
   ######################
@@ -27,6 +30,16 @@ defmodule RemoteChallenge.Users.Processes.UserWorker do
     schedule_update_users_points_and_min_number_with_random_number()
 
     {:noreply, Map.put(state, :min_number, Enum.random(0..100))}
+  end
+
+  @impl true
+  def handle_call(:list_users_with_points_higher_than_min_number, _from, state) do
+    users = UserService.list_users_with_points_higher_than_number(state.min_number)
+    timestamp = state.timestamp
+
+    state_with_timestamp_updated = Map.put(state, :timestamp, NaiveDateTime.utc_now())
+
+    {:reply, %{users: users, timestamp: timestamp}, state_with_timestamp_updated}
   end
 
   ###########
